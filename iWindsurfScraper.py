@@ -22,7 +22,7 @@ import requests
 
 
 class iWindsurfScraper(object):
-	"""Simple class to record and save data from Surfline
+	"""Simple class to record and save data from iWindsurf
 
 	Data is saved as a class variable. The highest level in this dictionary is the
 	region name. The next level down is also a dictionary with all recently saved
