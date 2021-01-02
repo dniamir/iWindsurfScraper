@@ -140,7 +140,7 @@ class iWindsurfScraper(object):
 		
 		inv_map = {v: k for k, v in self.LOCATION_LOOKUP.items()}
 		if location.title() in list(inv_map):
-			location = inv_map[location.upper()]
+			location = inv_map[location.title()]
 		df_wind = df_wind[df_wind['Location'] == location.title()]
 		
 		plt.figure(figsize=(10, 4))
@@ -156,17 +156,26 @@ class iWindsurfScraper(object):
 		
 		# Add weekday text
 		max_speed = np.max(df_wind['Wind Speed [mph]'].values)
-		df_temp = df_wind[df_wind['Hour'] == '12PM']
-		for x_temp, weekday in zip(df_temp.index, df_temp['Weekday'].values):
+		weekdays = df_wind['Weekday'].values
+		unique_weekdays = np.unique(weekdays)
+		for weekday in unique_weekdays:
+			df_temp = df_wind[df_wind['Weekday'] == weekday]
+			x_temp = df_temp.index.values
+			x_temp = (x_temp[0] + x_temp[-1]) / 2
 			# Add Weekday Labels
-			plt.gca().text(x=x_temp, y=max_speed - 1.5,
+			plt.gca().text(x=x_temp, y=max_speed + 1.5,
 			               s=weekday, fontsize=20, ha='center', va='center')
-		
+			
 		x_labels = df_wind['Hour'].values
 		x = np.arange(0, len(x_labels), 1)
 		y = df_wind['Wind Speed [mph]'].values
 		plt.plot(x, y, markersize=6, linewidth=1, markeredgecolor='black',
 		         marker='o', color='C0')
+		
+		# Update y-axis limits
+		ymin = plt.ylim()[0]
+		ymax = plt.ylim()[1]
+		plt.ylim([ymin, ymax + 2])
 		
 		plt.grid(True)
 		plt.xlabel('Hour', fontsize=16)
