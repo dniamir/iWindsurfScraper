@@ -88,7 +88,11 @@ class iWindsurfScraper(object):
 		if self.data is None:
 			self.data = df_wind
 		else:
-			self.data = pd.concat([self.data, df_wind], axis=1, sort=False)
+			self.data.append(df_wind)
+			self.data.drop_duplicates(subset=['Location', 'DateTime'],
+			                          keep='last',
+			                          inplace=True,
+			                          ignore_index=True)
 		
 		return df_wind
 		
