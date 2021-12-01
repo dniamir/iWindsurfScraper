@@ -59,8 +59,8 @@ class iWindsurfScraper(object):
 		spot_id = self.LOCATION_LOOKUP[location.title()]
 		
 		# Pro Model Forecast
-		URL = 'https://api.weatherflow.com/wxengine/rest/model/getModelDataBySpot?callback=jQuery17204981289850784012_1608525296698&units_wind=mph&units_temp=f&units_distance=mi&spot_id=%i&model_id=211&wf_token=b9f5e47c00d17fce97f3391d9c5ab285&_=1608525296891' % spot_id
-		
+		# URL = 'https://api.weatherflow.com/wxengine/rest/model/getModelDataBySpot?callback=jQuery17204981289850784012_1608525296698&units_wind=mph&units_temp=f&units_distance=mi&spot_id=%i&model_id=211&wf_token=b9f5e47c00d17fce97f3391d9c5ab285&_=1608525296891' % spot_id
+		URL = 'https://api.weatherflow.com/wxengine/rest/model/getModelDataBySpot?callback=jQuery17201072160731006555_1621113757475&units_wind=mph&units_temp=f&units_distance=mi&spot_id=%i&model_id=211&wf_token=ded29f84c9d0aabe36aef4f0170ca838&_=1621113758210' % spot_id
 		# Quicklook
 		# URL = 'https://api.weatherflow.com/wxengine/rest/model/getModelDataBySpot?callback=jQuery17204981289850784012_1608525296697&units_wind=mph&units_temp=f&units_distance=mi&spot_id=1374&model_id=-1&wf_token=b9f5e47c00d17fce97f3391d9c5ab285&_=1608525296884'
 		
@@ -147,8 +147,6 @@ class iWindsurfScraper(object):
 			location = inv_map[location.title()]
 		df_wind = df_wind[df_wind['Location'] == location.title()]
 		
-		plt.figure(figsize=(10, 4))
-		
 		weekdays = df_wind['Weekday'].values
 		_, unique_idxs = np.unique(weekdays, return_index=True)
 		
@@ -169,7 +167,7 @@ class iWindsurfScraper(object):
 			# Add Weekday Labels
 			plt.gca().text(x=x_temp, y=max_speed + 1.5,
 			               s=weekday, fontsize=20, ha='center', va='center')
-			
+		
 		x_labels = df_wind['Hour'].values
 		x = np.arange(0, len(x_labels), 1)
 		y = df_wind['Wind Speed [mph]'].values
@@ -181,10 +179,10 @@ class iWindsurfScraper(object):
 		ymax = plt.ylim()[1]
 		plt.ylim([ymin, ymax + 2])
 		
-		plt.grid(True)
-		plt.xlabel('Hour', fontsize=16)
-		plt.ylabel('Wind Speed [mph]', fontsize=16)
-		plt.title('Wind Speed @ %s' % location, fontsize=18)
+		plt.gca().yaxis.grid(True)
+		# plt.xlabel('Hour', fontsize=12)
+		# plt.ylabel('Wind Speed [mph]', fontsize=12)
+		plt.title('Wind Speed @ %s [mph]' % location, fontsize=12, color='white')
 		
-		_ = plt.xticks(ticks=x[::2], labels=x_labels[::2], rotation=45, fontsize=12)
+		_ = plt.xticks(ticks=x[::3], labels=x_labels[::3], rotation=45, fontsize=12)
 	
