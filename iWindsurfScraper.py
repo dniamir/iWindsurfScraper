@@ -131,6 +131,12 @@ class iWindsurfScraper(object):
 		                        'Weekday': wind_weekday,
 		                        'Hour': wind_hour,
 		                        'Wind Speed [mph]': wind_speed})
+
+		# Remove the last day if it's a duplicate of the first day
+		if df_wind['Weekday'].values[0] == df_wind['Weekday'].values[-1]:
+			check1 = df_wind['Weekday'] == df_wind['Weekday'].values[-1]
+			check2 = df_wind['Weekday'].index > df_wind.shape[0] // 2
+			df_wind = df_wind[~(check1 & check2)]
 		
 		return df_wind
 	
@@ -153,6 +159,8 @@ class iWindsurfScraper(object):
 		_, unique_idxs = np.unique(weekdays, return_index=True)
 		
 		# Plot lines separating days
+		plt.figure(figsize=(10,4))
+
 		df_temp = df_wind[df_wind['Hour'] == '12AM']
 		for x_temp in df_temp.index:
 			plt.axvline(x_temp, markersize=0, linewidth=3, color='red',
@@ -168,7 +176,7 @@ class iWindsurfScraper(object):
 			x_temp = (x_temp[0] + x_temp[-1]) / 2
 			# Add Weekday Labels
 			plt.gca().text(x=x_temp, y=max_speed + 1.5,
-			               s=weekday, fontsize=20, ha='center', va='center')
+			               s=weekday, fontsize=10, ha='center', va='center')
 		
 		x_labels = df_wind['Hour'].values
 		x = np.arange(0, len(x_labels), 1)
@@ -182,9 +190,7 @@ class iWindsurfScraper(object):
 		plt.ylim([ymin, ymax + 2])
 		
 		plt.gca().yaxis.grid(True)
-		# plt.xlabel('Hour', fontsize=12)
-		# plt.ylabel('Wind Speed [mph]', fontsize=12)
 		plt.title('Wind Speed @ %s [mph]' % location, fontsize=12, color='white')
 		
-		_ = plt.xticks(ticks=x[::3], labels=x_labels[::3], rotation=45, fontsize=12)
+		_ = plt.xticks(ticks=x[::6], labels=x_labels[::6], rotation=45, fontsize=10)
 	
