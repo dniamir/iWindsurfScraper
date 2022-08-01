@@ -61,7 +61,7 @@ class iWindsurfScraper(object):
 		# Pro Model Forecast
 		# URL = 'https://api.weatherflow.com/wxengine/rest/model/getModelDataBySpot?callback=jQuery17204981289850784012_1608525296698&units_wind=mph&units_temp=f&units_distance=mi&spot_id=%i&model_id=211&wf_token=b9f5e47c00d17fce97f3391d9c5ab285&_=1608525296891' % spot_id
 		# URL = 'https://api.weatherflow.com/wxengine/rest/model/getModelDataBySpot?callback=jQuery17201072160731006555_1621113757475&units_wind=mph&units_temp=f&units_distance=mi&spot_id=%i&model_id=211&wf_token=ded29f84c9d0aabe36aef4f0170ca838&_=1621113758210' % spot_id
-		URL = 'https://api.weatherflow.com/wxengine/rest/model/getModelDataBySpot?callback=jQuery172039141735927808785_1648414372200&units_wind=mph&units_temp=f&units_distance=mi&spot_id=%i&model_id=211&wf_token=888ad30c1a99d59c614b152ea68ac6d4&_=1648414372533' % spot_id
+		URL = 'https://api.weatherflow.com/wxengine/rest/model/getModelDataBySpot?callback=jQuery17208968884507429835_1659331306248&units_wind=mph&units_temp=f&units_distance=mi&spot_id=%i&model_id=211&wf_token=888ad30c1a99d59c614b152ea68ac6d4&_=1659331317260' % spot_id
 		
 		# Quicklook
 		# URL = 'https://api.weatherflow.com/wxengine/rest/model/getModelDataBySpot?callback=jQuery17204981289850784012_1608525296697&units_wind=mph&units_temp=f&units_distance=mi&spot_id=1374&model_id=-1&wf_token=b9f5e47c00d17fce97f3391d9c5ab285&_=1608525296884'
@@ -133,10 +133,18 @@ class iWindsurfScraper(object):
 		                        'Wind Speed [mph]': wind_speed})
 
 		# Remove the last day if it's a duplicate of the first day
-		if df_wind['Weekday'].values[0] == df_wind['Weekday'].values[-1]:
-			check1 = df_wind['Weekday'] == df_wind['Weekday'].values[-1]
-			check2 = df_wind['Weekday'].index > df_wind.shape[0] // 2
-			df_wind = df_wind[~(check1 & check2)]
+		indices = []
+
+		weekdays = np.unique(df_wind['Weekday'])
+		for weekday in weekdays:
+			df_temp = df_wind[df_wind['Weekday'] == weekday]
+			day_first = df_temp['DateTime'].astype('object').values[0]
+			datetimes = np.unique(df_temp['DateTime'].astype('object').values)
+			for index, row in df_temp.iterrows():
+				if row['DateTime'].day == day_first.day:
+					continue
+				indices += [index]
+		df_wind.drop(index=indices, inplace=True)
 		
 		return df_wind
 	
@@ -159,11 +167,11 @@ class iWindsurfScraper(object):
 		_, unique_idxs = np.unique(weekdays, return_index=True)
 		
 		# Plot lines separating days
-		plt.figure(figsize=(10,4))
+		# plt.figure(figsize=(10,4))
 
 		df_temp = df_wind[df_wind['Hour'] == '12AM']
 		for x_temp in df_temp.index:
-			plt.axvline(x_temp, markersize=0, linewidth=3, color='red',
+			plt.axvline(x_temp, markersize=0, linewidth=2, color='red',
 			            linestyle='--')
 		
 		# Add weekday text
@@ -181,7 +189,7 @@ class iWindsurfScraper(object):
 		x_labels = df_wind['Hour'].values
 		x = np.arange(0, len(x_labels), 1)
 		y = df_wind['Wind Speed [mph]'].values
-		plt.plot(x, y, markersize=6, linewidth=1, markeredgecolor='black',
+		plt.plot(x, y, markersize=0, linewidth=2, markeredgecolor='black',
 		         marker='o', color='C0')
 		
 		# Update y-axis limits
@@ -190,7 +198,8 @@ class iWindsurfScraper(object):
 		plt.ylim([ymin, ymax + 2])
 		
 		plt.gca().yaxis.grid(True)
+
 		plt.title('Wind Speed @ %s [mph]' % location, fontsize=12, color='white')
 		
-		_ = plt.xticks(ticks=x[::6], labels=x_labels[::6], rotation=45, fontsize=10)
+		_ = plt.xticks(ticks=x[::6], labels=x_labels[::6], rotation=45, fontsize=8)
 	
