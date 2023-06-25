@@ -40,6 +40,7 @@ class iWindsurfScraper(object):
 	
 	def __init__(self):
 		self.data = None
+		self.dict = None
 
 	def GetData(self, location):
 		"""Read the online iWindsurf data and return data as a dataframe
@@ -59,16 +60,8 @@ class iWindsurfScraper(object):
 		spot_id = self.LOCATION_LOOKUP[location.title()]
 		
 		# Pro Model Forecast
-		# URL = 'https://api.weatherflow.com/wxengine/rest/model/getModelDataBySpot?callback=jQuery17204981289850784012_1608525296698&units_wind=mph&units_temp=f&units_distance=mi&spot_id=%i&model_id=211&wf_token=b9f5e47c00d17fce97f3391d9c5ab285&_=1608525296891' % spot_id
-		# URL = 'https://api.weatherflow.com/wxengine/rest/model/getModelDataBySpot?callback=jQuery17201072160731006555_1621113757475&units_wind=mph&units_temp=f&units_distance=mi&spot_id=%i&model_id=211&wf_token=ded29f84c9d0aabe36aef4f0170ca838&_=1621113758210' % spot_id
-		URL = 'https://api.weatherflow.com/wxengine/rest/model/getModelDataBySpot?callback=jQuery17208968884507429835_1659331306248&units_wind=mph&units_temp=f&units_distance=mi&spot_id=%i&model_id=211&wf_token=888ad30c1a99d59c614b152ea68ac6d4&_=1659331317260' % spot_id
-		
-		# Quicklook
-		# URL = 'https://api.weatherflow.com/wxengine/rest/model/getModelDataBySpot?callback=jQuery17204981289850784012_1608525296697&units_wind=mph&units_temp=f&units_distance=mi&spot_id=1374&model_id=-1&wf_token=b9f5e47c00d17fce97f3391d9c5ab285&_=1608525296884'
-		
-		# Pro Forecast
-		# URL = "https://api.weatherflow.com/wxengine/rest/forecast/getOperationalForecast?callback=jQuery17206385514518878679_1608524974156&wf_token=b9f5e47c00d17fce97f3391d9c5ab285&forecast_id=2&_=1608524975003"
-		
+		URL = 'https://api.weatherflow.com/wxengine/rest/model/getModelDataBySpot?callback=jQuery17207893792136264395_1687721822087&units_wind=mph&units_temp=f&units_distance=mi&units_precip=in&spot_id=%i&model_id=211&wf_token=e98f1d911867fbb1943370810d53e775&_=1687721822297' % spot_id
+
 		# Update URL
 		url_region = '%s' % (URL)
 		
@@ -84,6 +77,7 @@ class iWindsurfScraper(object):
 		start_idx = soup_text.index('{')
 		end_idx = soup_text.rfind('}') + 1
 		wind_dict = json.loads(soup_text[start_idx:end_idx])
+		self.dict = wind_dict
 		
 		df_wind = self.OrganizeData(wind_dict)
 		
